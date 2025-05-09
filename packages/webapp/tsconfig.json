@@ -1,0 +1,23 @@
+{
+	"files": [],
+	"references": [
+		{
+			"path": "./tsconfig.app.json"
+		},
+		{
+			"path": "./tsconfig.node.json"
+		},
+		{
+			"path": "../webui-library"
+		},
+		{
+			"path": "../sdks"
+		},
+		{
+			"path": "../lib"
+		},
+		{
+			"path": "../isomorphic-blocs"
+		}
+	]
+}

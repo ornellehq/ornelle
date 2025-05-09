@@ -1,0 +1,39 @@
+{
+	"$schema": "https://biomejs.dev/schemas/1.8.3/schema.json",
+	"organizeImports": {
+		"enabled": true
+	},
+	"javascript": {
+		"formatter": {
+			"semicolons": "asNeeded",
+			"indentWidth": 2,
+			"indentStyle": "space"
+		}
+	},
+	"json": {
+		"formatter": {
+			"trailingCommas": "none"
+		}
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"nursery": {
+				"useSortedClasses": "info"
+			},
+			"recommended": true,
+			"style": {}
+		},
+		"ignore": [
+			"packages/sdks/src/server-sdk/**/*",
+			"packages/webapp/src/generated/routeTree.ts",
+			"packages/webpages/.astro/**/*"
+		]
+	},
+	"files": {
+		"ignore": [
+			"packages/webapp/src/generated/routeTree.ts",
+			"packages/isomorphic-blocs/src/generated/prisma/zod/index.ts"
+		]
+	}
+}

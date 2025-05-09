@@ -1,0 +1,55 @@
+@font-face {
+  font-family: "DMSans";
+  src: url("/fonts/dm-sans/DMSans-Regular.ttf") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "DMSans";
+  src: url("/fonts/dm-sans/DMSans-Regular.ttf") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "DMSans";
+  src: url("/fonts/dm-sans/DMSans-Medium.ttf") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "DMSans";
+  src: url("/fonts/dm-sans/DMSans-SemiBold.ttf") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "DMSans";
+  src: url("/fonts/dm-sans/DMSans-Bold.ttf") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Tex Gyre Heros";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/texgyreheros-regular.ttf") format("woff2");
+}
+/* cyrillic */
+@font-face {
+  font-family: "Tex Gyre Heros";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/texgyreheros-bold.ttf") format("woff2");
+}

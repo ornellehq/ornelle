@@ -1,0 +1,19 @@
+{
+	"extends": "../../tsconfig.app.json",
+	// "include": ["../sdks/src/server-sdk", "../isomorphic-blocs"],
+	"references": [
+		{
+			"path": "../sdks"
+		},
+		{
+			"path": "../isomorphic-blocs"
+		}
+	],
+	"compilerOptions": {
+		"composite": true,
+		"strict": true,
+		"noEmit": true,
+		"jsx": "react-jsx",
+		"jsxImportSource": "react"
+	}
+}

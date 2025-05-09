@@ -1,0 +1,28 @@
+{
+	"name": "lib",
+	"version": "0.5.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "AGPL-3.0-or-later",
+	"devDependencies": {
+		"@sendgrid/mail": "^8.1.3",
+		"@types/email-reply-parser": "^1.4.2",
+		"@types/html-to-text": "^9.0.4",
+		"@types/mailparser": "^3.4.5",
+		"@types/sanitize-html": "^2.15.0"
+	},
+	"peerDependencies": {
+		"@sendgrid/mail": "^8.1.3"
+	},
+	"dependencies": {
+		"email-reply-parser": "^1.9.4",
+		"html-to-text": "^9.0.5",
+		"mailparser": "^3.7.2",
+		"sanitize-html": "^2.15.0"
+	}
+}

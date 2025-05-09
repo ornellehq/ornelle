@@ -1,0 +1,588 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [vector]
+}
+
+generator jsonSchema {
+  provider                 = "prisma-json-schema-generator"
+  output                   = "../src/generated/prisma"
+  schemaId                 = "prisma"
+  includeRequiredFields    = "true"
+  keepRelationFields       = "false"
+  keepRelationScalarFields = "true"
+}
+
+generator kysely {
+  provider = "prisma-kysely"
+  output   = "../src/generated/prisma"
+  fileName = "kysely.ts"
+}
+
+model User {
+  id         String      @id @default(cuid())
+  email      String      @unique
+  updatedAt  DateTime    @updatedAt
+  createdAt  DateTime    @default(now())
+  firstName  String
+  deletedAt  DateTime?
+  profiles   Profile[]
+  workspaces Workspace[]
+
+  @@index([email, deletedAt])
+}
+
+model Profile {
+  id             String         @id @default(cuid())
+  updatedAt      DateTime       @updatedAt
+  createdAt      DateTime       @default(now())
+  displayName    String?
+  firstName      String
+  lastName       String
+  userId         String
+  pictureSlug    String?
+  deactivated    DateTime?
+  workspaceId    String
+  applications   Application[]
+  candidates     Candidate[]
+  attributes     Attribute[]
+  forms          Form[]
+  reviews        Review[]
+  views          View[]
+  conversations  Conversation[]
+  emailAddresses EmailAddress[]
+  messages       Message[]
+  user           User           @relation(fields: [userId], references: [id])
+  workspace      Workspace      @relation(fields: [workspaceId], references: [id])
+  savedFolders   SavedFolder[]  @relation("SavedFoldersCreator")
+  saves          Saved[]        @relation("SavedCreator")
+  savedFolder    SavedFolder?   @relation(fields: [savedFolderId], references: [id])
+  savedFolderId  String?
+  saved          Saved?         @relation(fields: [savedId], references: [id])
+  savedId        String?
+
+  @@index([workspaceId, deactivated])
+}
+
+model Workspace {
+  id                  String              @id @default(cuid())
+  updatedAt           DateTime            @updatedAt
+  createdAt           DateTime            @default(now())
+  url                 String              @unique
+  name                String
+  logoSlug            String?
+  creatorId           String
+  onboarding          Json                @default("{}")
+  members             Profile[]
+  attributeValues     AttributeValue[]
+  attributes          Attribute[]
+  roles               Role[]
+  openings            Opening[]
+  applications        Application[]
+  candidates          Candidate[]
+  entities            Entity[]
+  forms               Form[]
+  reviews             Review[]
+  creator             User                @relation(fields: [creatorId], references: [id])
+  emailTemplates      EmailTemplate[]
+  activities          Activity[]
+  views               View[]
+  listingThemes       ListingTheme[]
+  files               File[]
+  conversations       Conversation[]
+  emailAddresses      EmailAddress[]
+  messages            Message[]
+  applicationStatuses ApplicationStatus[]
+  savedFolders        SavedFolder[]
+  saves               Saved[]
+
+  @@index([creatorId])
+}
+
+// Entities and EAV stuff
+model Role {
+  id          String    @id @default(cuid())
+  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime  @default(now())
+  title       String
+  /// [RTEContent]
+  description Json      @default("{\"html\": \"\", \"json\": \"\"}")
+  workspaceId String
+  deletedAt   DateTime?
+  openings    Opening[]
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+
+  @@index([workspaceId, deletedAt])
+}
+
+model Opening {
+  id           String        @id @default(cuid())
+  updatedAt    DateTime      @updatedAt
+  createdAt    DateTime      @default(now())
+  title        String
+  /// [RTEContent]
+  description  Json          @default("{\"html\": \"\", \"json\": \"\"}")
+  workspaceId  String
+  roleId       String
+  formId       String?
+  status       OpeningStatus @default(Published)
+  deletedAt    DateTime?
+  applications Application[]
+  workspace    Workspace     @relation(fields: [workspaceId], references: [id])
+  role         Role          @relation(fields: [roleId], references: [id])
+  form         Form?         @relation(fields: [formId], references: [id])
+
+  @@index([workspaceId, deletedAt])
+}
+
+enum OpeningStatus {
+  Published
+  Draft
+}
+
+enum ApplicationStatusCategory {
+  NotStarted
+  Started
+  Completed
+  Rejected
+}
+
+model ApplicationStatus {
+  id            String                    @id @default(cuid())
+  updatedAt     DateTime                  @updatedAt
+  createdAt     DateTime                  @default(now())
+  name          String
+  workspaceId   String
+  category      ApplicationStatusCategory
+  isOutOfTheBox Boolean                   @default(false)
+  color         String?
+  applications  Application[]
+  workspace     Workspace                 @relation(fields: [workspaceId], references: [id])
+  description   String                    @default("")
+
+  @@unique([workspaceId, name])
+  @@index([workspaceId])
+}
+
+model Application {
+  id                String                       @id @default(cuid())
+  updatedAt         DateTime                     @updatedAt
+  createdAt         DateTime                     @default(now())
+  resumeLink        String
+  resumeText        String
+  resumeData        Json                         @default("{}")
+  workspaceId       String
+  openingId         String
+  candidateId       String
+  creatorId         String?
+  statusId          String?
+  numberInWorkspace Int // Autoincremented by workspace
+  /// [RTEContent]
+  notes             Json                         @default("{\"html\": \"\", \"json\": \"\"}")
+  /// [FormResponses]
+  responses         Json
+  deletedAt         DateTime?
+  resumeVector      Unsupported("vector(1536)")?
+  reviews           Review[]
+  messages          Message[]
+  conversations     Conversation[]
+  workspace         Workspace                    @relation(fields: [workspaceId], references: [id])
+  opening           Opening                      @relation(fields: [openingId], references: [id])
+  candidate         Candidate                    @relation(fields: [candidateId], references: [id])
+  creator           Profile?                     @relation(fields: [creatorId], references: [id])
+  status            ApplicationStatus?           @relation(fields: [statusId], references: [id])
+
+  @@unique([workspaceId, numberInWorkspace])
+  @@index([workspaceId, deletedAt])
+}
+
+model Candidate {
+  id                String         @id @default(cuid())
+  updatedAt         DateTime       @updatedAt
+  createdAt         DateTime       @default(now())
+  firstName         String
+  lastName          String
+  email             String
+  workspaceId       String
+  creatorId         String?
+  numberInWorkspace Int // Autoincremented by workspace
+  deletedAt         DateTime?
+  applications      Application[]
+  conversations     Conversation[]
+  workspace         Workspace      @relation(fields: [workspaceId], references: [id])
+  creator           Profile?       @relation(fields: [creatorId], references: [id])
+  messages          Message[]
+
+  @@unique([workspaceId, numberInWorkspace])
+  @@unique([workspaceId, email])
+  @@index([workspaceId, deletedAt])
+}
+
+model Entity {
+  id          String      @id @default(cuid())
+  updatedAt   DateTime    @updatedAt
+  createdAt   DateTime    @default(now())
+  name        String
+  workspaceId String
+  attributes  Attribute[]
+  workspace   Workspace   @relation(fields: [workspaceId], references: [id])
+
+  @@index([workspaceId])
+}
+
+enum EntityType {
+  Role
+  Opening
+  Application
+  Candidate
+  // Review
+  Custom
+}
+
+model Attribute {
+  id              String            @id @default(cuid())
+  updatedAt       DateTime          @updatedAt
+  createdAt       DateTime          @default(now())
+  entityType      EntityType
+  name            String
+  dataType        AttributeDataType
+  workspaceId     String
+  creatorId       String
+  entityId        String?
+  builtIn         Boolean
+  configuration   Json              @default("{}")
+  attributeValues AttributeValue[]
+  workspace       Workspace         @relation(fields: [workspaceId], references: [id])
+  creator         Profile           @relation(fields: [creatorId], references: [id])
+  entity          Entity?           @relation(fields: [entityId], references: [id])
+
+  @@index([workspaceId, entityType, entityId])
+}
+
+enum AttributeDataType {
+  Text
+  Number
+  Toggle
+  Select
+  Date
+  Email
+  URL
+  File
+  Phone
+  Record
+  Range
+  Location
+  Member
+  // List
+}
+
+model AttributeValue {
+  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime  @default(now())
+  entityId    String
+  attributeId String
+  workspaceId String
+  data        Json      @default("{\"value\": {}}")
+  attribute   Attribute @relation(fields: [attributeId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+
+  @@unique([attributeId, entityId])
+  @@index([workspaceId])
+}
+
+model Review {
+  id            String       @id @default(cuid())
+  updatedAt     DateTime     @updatedAt
+  createdAt     DateTime     @default(now())
+  workspaceId   String
+  applicationId String
+  authorId      String
+  responses     Json
+  description   String       @default("")
+  status        ReviewStatus @default(Pending)
+  source        ActionSource
+  sourceId      String
+  formId        String?
+  workspace     Workspace    @relation(fields: [workspaceId], references: [id])
+  application   Application  @relation(fields: [applicationId], references: [id])
+  author        Profile      @relation(fields: [authorId], references: [id])
+  form          Form?        @relation(fields: [formId], references: [id])
+
+  @@index([workspaceId])
+}
+
+enum ReviewStatus {
+  Pending
+  Approved
+  Rejected
+}
+
+enum ActionSource {
+  Profile
+  Candidate
+}
+
+model Form {
+  id          String    @id @default(cuid())
+  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime  @default(now())
+  name        String
+  description String
+  workspaceId String
+  authorId    String
+  type        FormType  @default(Application)
+  content     Json      @default("{\"json\": \"\", \"version\": \"1\"}")
+  deletedAt   DateTime?
+  openings    Opening[]
+  reviews     Review[]
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  author      Profile   @relation(fields: [authorId], references: [id])
+
+  @@index([workspaceId, deletedAt])
+}
+
+enum FormType {
+  Application
+  Review
+}
+
+enum EmailTemplateType {
+  Application
+}
+
+model EmailTemplate {
+  id          String            @id @default(cuid())
+  updatedAt   DateTime          @updatedAt
+  createdAt   DateTime          @default(now())
+  name        String
+  description String
+  workspaceId String
+  deletedAt   DateTime?
+  subject     String            @default("")
+  type        EmailTemplateType @default(Application)
+  /// [RTEContent]
+  content     Json              @default("{\"html\": \"\", \"json\": \"\"}")
+  workspace   Workspace         @relation(fields: [workspaceId], references: [id])
+
+  @@index([workspaceId, deletedAt])
+}
+
+model Activity {
+  id            String       @id @default(cuid())
+  updatedAt     DateTime     @updatedAt
+  createdAt     DateTime     @default(now())
+  workspaceId   String
+  sourceId      String
+  entityId      String?
+  entityType    EntityType
+  source        ActionSource
+  previousValue Json?
+  newValue      Json?
+  metadata      Json?
+  type          ActivityType @default(AttributeUpdate)
+  causedById    String?
+  workspace     Workspace    @relation(fields: [workspaceId], references: [id])
+
+  @@index([workspaceId, entityId, entityType])
+}
+
+enum ActivityType {
+  AttributeUpdate
+  ConversationCreated
+  ConversationStatusChanged
+  MessageSent
+  EmailSent
+  EmailReceived
+  ApplicationStatusUpdate
+  ReviewRecommended
+  ReviewRejected
+}
+
+model View {
+  id          String       @id @default(cuid())
+  updatedAt   DateTime     @updatedAt
+  createdAt   DateTime     @default(now())
+  name        String
+  description String?
+  workspaceId String
+  creatorId   String
+  folderId    String?
+  public      Boolean
+  entityType  EntityType
+  config      Json         @default("{\"filters\": [],\"sort\": {}}")
+  workspace   Workspace    @relation(fields: [workspaceId], references: [id])
+  creator     Profile      @relation(fields: [creatorId], references: [id])
+  folder      SavedFolder? @relation(fields: [folderId], references: [id])
+
+  @@index([workspaceId, entityType])
+}
+
+model ListingTheme {
+  key            String    @default(cuid())
+  updatedAt      DateTime  @updatedAt
+  createdAt      DateTime  @default(now())
+  name           String
+  workspaceId    String
+  openingsConfig Json
+  openingConfig  Json
+  active         Boolean   @default(false)
+  workspace      Workspace @relation(fields: [workspaceId], references: [id])
+
+  @@unique([workspaceId, key])
+}
+
+model File {
+  id          String    @id @default(cuid())
+  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime  @default(now())
+  name        String
+  slug        String    @unique
+  path        String
+  size        Int
+  mime        String
+  checksum    String?   @unique
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+
+  @@index([workspaceId])
+}
+
+model EmailAddress {
+  id          String    @id @default(cuid())
+  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime  @default(now())
+  deletedAt   DateTime?
+  workspaceId String
+  profileId   String
+  email       String    @unique
+  isActive    Boolean   @default(true)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  profile     Profile   @relation(fields: [profileId], references: [id])
+
+  @@index([workspaceId, profileId])
+}
+
+model Conversation {
+  id            String             @id @default(cuid())
+  updatedAt     DateTime           @updatedAt
+  createdAt     DateTime           @default(now())
+  title         String
+  status        ConversationStatus @default(OPEN)
+  workspaceId   String
+  applicationId String?
+  candidateId   String?
+  creatorId     String?
+  messages      Message[]
+  workspace     Workspace          @relation(fields: [workspaceId], references: [id])
+  application   Application?       @relation(fields: [applicationId], references: [id])
+  creator       Profile?           @relation(fields: [creatorId], references: [id])
+  candidate     Candidate?         @relation(fields: [candidateId], references: [id])
+
+  @@index([workspaceId, applicationId])
+}
+
+enum ConversationStatus {
+  OPEN
+  CLOSED
+  LOCKED
+}
+
+model Message {
+  id              String        @id @default(cuid())
+  updatedAt       DateTime      @updatedAt
+  createdAt       DateTime      @default(now())
+  deletedAt       DateTime?
+  type            MessageType
+  status          MessageStatus @default(DRAFT)
+  content         String        @db.Text
+  applicationId   String?
+  fromCandidateId String?
+  conversationId  String?
+  workspaceId     String
+  authorId        String?
+  parentId        String?
+  metadata        Json?
+  attachments     Json          @default("{\"ids\": [], \"version\": 1}")
+  replies         Message[]     @relation("MessageReplies")
+  // Email fields
+  subject         String?
+  fromEmail       String?
+  toEmails        String[]
+  ccEmails        String[]
+  bccEmails       String[]
+  conversation    Conversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  application     Application?  @relation(fields: [applicationId], references: [id])
+  author          Profile?      @relation(fields: [authorId], references: [id])
+  workspace       Workspace     @relation(fields: [workspaceId], references: [id])
+  parent          Message?      @relation("MessageReplies", fields: [parentId], references: [id])
+  fromCandidate   Candidate?    @relation(fields: [fromCandidateId], references: [id])
+
+  @@index([conversationId])
+  @@index([workspaceId])
+}
+
+enum MessageStatus {
+  DRAFT
+  SENDING
+  SENT
+  PUBLISHED
+  DELIVERED
+  FAILED
+  BOUNCED
+  ARCHIVED
+}
+
+enum MessageType {
+  EMAIL_OUTBOUND
+  EMAIL_INBOUND
+  INTERNAL_MESSAGE
+  INTERNAL_RESPONSE
+  PLATFORM
+}
+
+// Favorites system models
+model SavedFolder {
+  id                    String        @id @default(cuid())
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+  name                  String
+  creatorId             String // Owner profile
+  workspaceId           String
+  isSharedWithWorkspace Boolean       @default(false)
+  sharedWithProfiles    Profile[] // IDs of profiles this folder is shared with
+  favorites             Saved[]
+  views                 View[]
+  // Add parent-child relationship for nesting folders
+  parentId              String? // ID of the parent folder (null for root folders)
+  parent                SavedFolder?  @relation("FolderHierarchy", fields: [parentId], references: [id])
+  children              SavedFolder[] @relation("FolderHierarchy")
+  creator               Profile       @relation("SavedFoldersCreator", fields: [creatorId], references: [id])
+  workspace             Workspace     @relation(fields: [workspaceId], references: [id])
+
+  @@index([workspaceId, creatorId, parentId])
+}
+
+model Saved {
+  id                    String       @id @default(cuid())
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+  name                  String?
+  creatorId             String // Owner profile
+  workspaceId           String
+  entityId              String // ID of the entity being favorited (e.g., viewId, candidateId)
+  entityType            String // Type of entity being favorited (e.g., "View", "Candidate")
+  folderId              String? // Optional folder assignment
+  isSharedWithWorkspace Boolean      @default(false)
+  sharedWithProfiles    Profile[] // IDs of profiles this favorite is shared with
+  creator               Profile      @relation("SavedCreator", fields: [creatorId], references: [id])
+  workspace             Workspace    @relation(fields: [workspaceId], references: [id])
+  folder                SavedFolder? @relation(fields: [folderId], references: [id])
+
+  @@unique([creatorId, entityId, entityType]) // A profile can favorite an entity only once
+  @@index([workspaceId, creatorId, folderId])
+}

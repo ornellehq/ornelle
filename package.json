@@ -1,0 +1,48 @@
+{
+	"name": "ornelle",
+	"version": "0.5.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"test": "pnpm --stream --filter '*' test",
+		"prepare": "husky",
+		"dev": "conc \"pnpm --stream --filter '*' dev\" --prefix='{name} ➜' --names='app' --prefix-colors='#F45866'"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "AGPL-3.0-or-later",
+	"devDependencies": {
+		"@biomejs/biome": "1.8.3",
+		"@tsconfig/node22": "^22.0.0",
+		"@tsconfig/strictest": "^2.0.5",
+		"@types/indefinite": "^2.3.4",
+		"@types/node": "^22.0.2",
+		"concurrently": "^9.1.2",
+		"husky": "^9.1.4",
+		"lint-staged": "^15.2.7",
+		"prettier": "^3.3.3",
+		"ts-node": "^10.9.2",
+		"typescript": "^5.5.4",
+		"vitest": "^3.1.2"
+	},
+	"lint-staged": {
+		"**/*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,jsonc}": [
+			"biome check --write --no-errors-on-unmatched --staged"
+		],
+		"**/*!(package).{json}": [
+			"biome check --write --no-errors-on-unmatched --staged"
+		]
+	},
+	"engines": {
+		"node": "22"
+	},
+	"dependencies": {
+		"dayjs": "^1.11.12",
+		"deepmerge-ts": "^7.1.5",
+		"indefinite": "^2.5.1",
+		"obscenity": "^0.3.1",
+		"rrule": "^2.8.1",
+		"ts-pattern": "^5.2.0",
+		"zod": "^3.23.8"
+	}
+}

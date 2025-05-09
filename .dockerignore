@@ -1,0 +1,15 @@
+# Docker
+.docker
+docker-compose.override.yml
+
+# Node
+node_modules
+dist
+build
+
+# Uploads
+uploads/*
+!uploads/.gitkeep
+.env
+.venv
+venv

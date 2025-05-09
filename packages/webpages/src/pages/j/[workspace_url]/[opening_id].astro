@@ -1,0 +1,185 @@
+---
+import * as cheerio from "cheerio"
+import type { FormField } from "isomorphic-blocs/src/types/form"
+import { GetAttributesEntityTypesEnum } from "sdks/src/server-sdk"
+import ApplicationForm from "../../../components/application-form"
+import AppliedCard from "../../../components/applied-card"
+import Layout from "../../../layouts/Layout.astro"
+import { listingApi } from "../../../util"
+
+export const prerender = false
+const { opening_id, workspace_url } = Astro.params as {
+  opening_id: string
+  workspace_url: string
+}
+
+const existingApplications = Astro.cookies.get("application")?.json()
+const existingApplication = existingApplications?.[opening_id]
+
+const { workspace, content, opening, propertiesToShow, application } =
+  await listingApi.getOpening({
+    url: workspace_url,
+    id: opening_id,
+    email: existingApplication?.email,
+  })
+
+const { json: fields } = (opening.form?.content as
+  | {
+      json: FormField[]
+      version: string
+    }
+  | undefined) ?? { json: [] }
+
+const $ = cheerio.load(content.html)
+const variables = $("span[data-variable]")
+variables.each((n) => {
+  const $container = $(variables.get(n))
+  const id = $container.attr("data-variable") as string
+  const entityType = $container.attr("data-entity")
+
+  const value =
+    entityType === GetAttributesEntityTypesEnum.Role
+      ? opening.role[id]
+      : opening[id]
+  $container.html(id === "description" ? value.html : value ?? "")
+})
+const html = $.html()
+const title = opening.title
+---
+
+<Layout title={`${opening.title}`} name={workspace.name} logo={workspace.logo}>
+  <main class="max-w-[720px] mx-auto py-16 flex flex-col gap-y-5">
+    <div class="mb-5 rounded-[10px]">
+      <h1 class="mb-2 text-base font-semibold">{title}</h1>
+      <div class="flex gap-x-1 items-center text-gray-500 text-xs">
+        <!-- <span>Engineering</span> -->
+        {
+          propertiesToShow.map((property, index) => {
+            const value = opening[property] ?? opening.role[property] ?? ""
+            return value ? (
+              <>
+                {index === 0 || !value.trim() ? null : <span> • </span>}
+                <span>{value}</span>
+              </>
+            ) : null
+          })
+        }
+      </div>
+    </div>
+    <div class="p-5 bg-gray-100 rounded-xl">
+      <!-- [#FBF4F0] -->
+      <div class="mb-4 text-[13px] text-gray-600">
+        Details of our {opening.title} opening
+      </div>
+      <div
+        set:html={html}
+        class="max-h-[65vh] overflow-y-auto prose prose-sm prose-hr:my-5 prose-headings:font-medium prose-h1:font-semibold max-w-full py-4 px-10 mx-auto prose-p:text-slate-600 bg-white border border-gray-200 rounded-lg shadow-[1px_1px_10px_rgba(0,0,0,0.05)]"
+      />
+    </div>
+    <div class="flex flex-col gap-y-4">
+      {
+        existingApplication && application ? (
+          <AppliedCard application={application} client:load />
+        ) : (
+          <ApplicationForm
+            fields={fields}
+            url={workspace_url}
+            openingId={opening_id}
+            client:load
+          />
+        )
+      }
+      <!-- <button
+        class="h-12 leading-[3rem] px-3 text-sm text-left rounded-md bg-white shadow-borderNdFlat"
+        >Am I a fit?</button
+      > -->
+    </div>
+    <!-- <div class="w-72">
+      <h1 class="text-2xl font-semibold">{opening.title}</h1>
+    </div>
+    <div class="flex-1 relative flex items-center gap-x-5">
+      {
+        tabs.map((tab, index) => {
+          return (
+            <div>
+              <input
+                type="radio"
+                name="main-tab"
+                id={tab}
+                checked={index === 0}
+                class="peer sr-only"
+              />
+              <label
+                for={tab}
+                class="block py-1 border-b border-transparent peer-checked:border-gray-400 border-solid"
+              >
+                {tab}
+              </label>
+              <div class="py-4 w-full absolute left-0 hidden peer-checked:block">
+                {tab === "Overview" ? (
+                  <div class="" set:html={opening.description?.html ?? ""} />
+                ) : (
+                  <form
+                    method="POST"
+                    action={actions.createApplication}
+                    class="flex flex-col gap-y-3"
+                  >
+                    {fields.map((field) => {
+                      const { name, type, required, id } = field
+                      return (
+                        <div>
+                          <label>{name}</label>
+                          {type === "text" ||
+                          type === "url" ||
+                          type === "email" ? (
+                            <input
+                              type={type}
+                              placeholder=""
+                              name={id}
+                              required={required}
+                              class="block w-full leading-10 h-10 px-2 border border-gray-300 border-solid rounded-md"
+                            />
+                          ) : type === "file" ? (
+                            <div class="ats-dropzone flex items-center p-8 border border-gray-200 border-solid rounded-md">
+                              <input
+                                required={required}
+                                type="file"
+                                id="fileInput"
+                                multiple
+                                name={id}
+                                class="sr-only"
+                              />
+                              <button
+                                type="button"
+                                onclick="document.getElementById('fileInput').click()"
+                              >
+                                Upload file
+                              </button>{" "}
+                              or drag and drop here
+                            </div>
+                          ) : null}
+                        </div>
+                      )
+                    })}
+                    <div>
+                      <button
+                        type="submit"
+                        class="w-full h-10 leading-10 px-3 text-center bg-purple-600 text-white rounded-md"
+                      >
+                        Submit Application
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
+            </div>
+          )
+        })
+      }
+    </div> -->
+  </main>
+</Layout>
+
+<!-- 
+  Create application/candidate, Upload resume, Extract text from resume, 
+-->

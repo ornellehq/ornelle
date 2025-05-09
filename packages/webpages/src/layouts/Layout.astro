@@ -1,0 +1,194 @@
+---
+import dayjs from "dayjs"
+import relativeTime from "dayjs/plugin/relativeTime"
+interface Props {
+  title: string
+  logo?: string | undefined
+  name: string
+}
+
+const { title, logo, name } = Astro.props
+
+dayjs.extend(relativeTime)
+---
+
+<!doctype html>
+<html lang="en" class="font-tex">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="description" content="Astro description" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href={logo} />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=IBM+Plex+Sans+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Inter+Tight:ital,wght@0,100..900;1,100..900&family=Manrope:wght@200..800&family=Roboto+Flex:opsz,wght@8..144,100..1000&family=Syne:wght@400..800&family=Vazirmatn:wght@100..900&family=Yantramanav:wght@100;300;400;500;700;900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="">
+    <header class="p-3 sticky top-0">
+      <div class="text-[13px] flex items-center">
+        {
+          logo ? (
+            <img
+              src={logo}
+              class="w-6 h-6 mr-2 rounded-lg object-contain object-center"
+            />
+          ) : (
+            <span class="h-6 w-6 mr-2 rounded-lg bg-gray-200 inline-flex items-center justify-center">
+              {name.substring(0, 2)}
+            </span>
+          )
+        }
+        <span class="font-medium">{name}</span>
+      </div>
+    </header>
+    <slot />
+  </body>
+</html>
+<style is:global>
+  @font-face {
+    font-family: "Tex Gyre Heros";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("/fonts/texgyreheros-regular.ttf") format("woff2");
+  }
+  /* cyrillic */
+  @font-face {
+    font-family: "Tex Gyre Heros";
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url("/fonts/texgyreheros-bold.ttf") format("woff2");
+  }
+
+  @font-face {
+    font-family: "Satoshi";
+    src: url("/fonts/Satoshi-Variable.ttf") format("woff2");
+    /* font-weight: bold; */
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Satoshi";
+    src: url("/fonts/Satoshi-Variable.ttf") format("woff2");
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Satoshi";
+    src: url("/fonts/Satoshi-Variable.ttf") format("woff2");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Satoshi";
+    src: url("/fonts/Satoshi-Variable.ttf") format("woff2");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Satoshi";
+    src: url("/fonts/Satoshi-Variable.ttf") format("woff2");
+    font-weight: black;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root {
+    --accent: 136, 58, 234;
+    --accent-light: 224, 204, 250;
+    --accent-dark: 49, 10, 101;
+    --accent-gradient: linear-gradient(
+      45deg,
+      rgb(var(--accent)),
+      rgb(var(--accent-light)) 30%,
+      white 60%
+    );
+  }
+
+  html {
+    /* font-family: "Tex Gyre Heros", sans-serif; */
+    /* background: #13151a; */
+  }
+  code {
+    font-family:
+      Menlo,
+      Monaco,
+      Lucida Console,
+      Liberation Mono,
+      DejaVu Sans Mono,
+      Bitstream Vera Sans Mono,
+      Courier New,
+      monospace;
+  }
+
+  .manrope {
+    font-family: "Manrope", Arial, Helvetica, sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+  }
+
+  .roboto-flex {
+    font-family: "Roboto Flex", Arial, Helvetica, sans-serif;
+    font-optical-sizing: auto;
+    font-weight: <weight>;
+    font-style: normal;
+    font-variation-settings:
+      "slnt" 0,
+      "wdth" 100,
+      "GRAD" 0,
+      "XOPQ" 96,
+      "XTRA" 468,
+      "YOPQ" 79,
+      "YTAS" 750,
+      "YTDE" -203,
+      "YTFI" 738,
+      "YTLC" 514,
+      "YTUC" 712;
+  }
+
+  .be-vietnam-pro {
+    font-family: "Be Vietnam Pro", Arial, Helvetica, sans-serif;
+    font-style: normal;
+  }
+
+  .inter-tight {
+    font-family: "Inter Tight", Arial, Helvetica, sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+  }
+
+  .ibm-plex-sans-condensed {
+    font-family: "IBM Plex Sans Condensed", Arial, Helvetica, sans-serif;
+    font-style: normal;
+  }
+
+  .yantramanav {
+    font-family: "Yantramanav", Arial, Helvetica, sans-serif;
+    font-style: normal;
+  }
+
+  .vazirmatn {
+    font-family: "Vazirmatn", Arial, Helvetica, sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+  }
+
+  .syne {
+    font-family: "Syne", Arial, Helvetica, sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+  }
+</style>

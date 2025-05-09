@@ -1,0 +1,21 @@
+{
+	"extends": "../../tsconfig.json",
+	"compilerOptions": {
+		"target": "ES2024",
+		"lib": ["DOM", "ES2024"],
+		"jsx": "react-jsx",
+		"strictNullChecks": true,
+		"outDir": "dist",
+		"paths": {
+			"~/*": ["./src/*"],
+			"lib/*": ["../lib/*"],
+			"isomorphic-blocs/*": ["../isomorphic-blocs/*"]
+		},
+		"noEmitOnError": false,
+		"skipLibCheck": true,
+		"rootDirs": ["./src", "../isomorphic-blocs"]
+	},
+	"files": ["src/index.ts", "./scripts/generate-sdk.ts"],
+	"include": ["./src/**/*", "./src/**/*.json", "./src/types.d.ts"],
+	"exclude": ["node_modules", "../../node_modules", "dist", ".prisma"]
+}

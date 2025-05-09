@@ -1,0 +1,9 @@
+packages:
+  - packages/*
+onlyBuiltDependencies:
+  - '@nestjs/core'
+  - '@openapitools/openapi-generator-cli'
+  - '@prisma/client'
+  - '@prisma/engines'
+  - esbuild
+  - prisma

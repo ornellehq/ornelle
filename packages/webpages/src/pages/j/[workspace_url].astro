@@ -1,0 +1,155 @@
+---
+import * as cheerio from "cheerio"
+import type { GetOpenings200ResponseInner } from "sdks/src/server-sdk"
+import Layout from "../../layouts/Layout.astro"
+import { listingApi } from "../../util"
+
+export const prerender = false
+const noValueSymbol = crypto.randomUUID() // Symbol("No attribute value symbol")
+const { workspace_url = "" } = Astro.params
+const { workspace, content, openings } = await listingApi.getLandingData({
+  url: workspace_url,
+})
+const $ = cheerio.load(content.html)
+const openingsContainer = $("div[data-openings]")
+
+let groupedOpenings: Record<
+  string,
+  { id: string; name: string; openings: GetOpenings200ResponseInner[] }
+> = {}
+openingsContainer.each((n) => {
+  const $container = $(openingsContainer.get(n))
+  const groupBy = $container.attr("data-group-by")
+  const properties = (() => {
+    try {
+      const attr = $container.attr("data-properties")
+      if (attr) return JSON.parse(attr)
+    } catch (err) {}
+    return []
+  })() as string[]
+
+  // @ts-ignore
+  groupedOpenings = groupBy
+    ? openings.reduce((acc, opening) => {
+        // const configuration =
+        //   groupByAttribute._configuration as CreateAttributeRequestConfigurationAnyOf4
+        // const options = configuration.options
+        const value = opening[groupBy] ?? opening.role?.[groupBy]
+
+        if (value) {
+          return {
+            // biome-ignore lint/performance/noAccumulatingSpread: <explanation>
+            ...acc,
+            [value]: {
+              id: value,
+              name: value,
+
+              // @ts-ignore
+              openings: [...(acc[value]?.openings ?? []), opening],
+            },
+          }
+        }
+
+        return {
+          // biome-ignore lint/performance/noAccumulatingSpread: <explanation>
+          ...acc,
+          [noValueSymbol]: {
+            id: noValueSymbol,
+            name: "",
+            // @ts-ignore
+            openings: [...(acc[noValueSymbol]?.openings ?? []), opening],
+          },
+        }
+      }, {})
+    : { all: { id: "all", name: "All", openings } }
+
+  const content = `
+    ${Object.values(groupedOpenings)
+      .map(({ openings, name }) => {
+        return `
+        <div class="my-2">
+          ${
+            groupBy
+              ? `<div class="mb-2 text-gray-400 text-xs">
+                            ${name}
+                            <span class=" align-super">
+                              ${openings.length}
+                            </span>
+                          </div>`
+              : null
+          }
+          <div class="flex flex-col -ml-2">
+            ${openings
+              .map((opening) => {
+                const { id, title } = opening
+
+                return `<a href="/j/${workspace_url}/${id}" class="flex items-center py-2 px-2 decoration-transparent leading-snug rounded-lg bg-white transition-all duration-100 hover:bg-slate-50">
+                  <span class="mr-2">${title}</span>
+                  <span class="text-gray-400 text-xs">
+                    ${properties
+                      .map((property, index) => {
+                        const value = (
+                          opening[property] ?? opening.role?.[property]
+                        )?.trim()
+                        return `${index === 0 || !value ? "" : "  •  "}${value ?? ""}`
+                      })
+                      .join("")}
+                  </span>
+                </a>`
+              })
+              .join("")}
+          </div>
+        </div>
+      `
+      })
+      .join("")}
+  `
+
+  $container.html(content)
+  $container.addClass("mb-8 mt-3 flex flex-col gap-y-2")
+})
+
+const html = $.html()
+---
+
+<Layout
+  title={`${workspace.name} openings`}
+  name={workspace.name}
+  logo={workspace.logo}
+>
+  <main class="p-8 md:py-14 xl:py-20 flex flex-col gap-y-6">
+    <!-- <h1 class="text-xl font-semibold">Openings ({openings.length})</h1> -->
+    <div
+      set:html={html}
+      class="prose prose-sm prose-hr:my-5 prose-headings:font-medium prose-h1:font-semibold max-w-3xl md:px-10 2xl:px-14 mx-auto prose-p:text-slate-600"
+    />
+    <ul class="">
+      <!-- {
+        openings.map((opening) => {
+          return (
+            <li>
+              <a href={`/j/${workspace_url}/${opening.id}`} class="block py-2">
+                <h3>{opening.title}</h3>
+              </a>
+            </li>
+          )
+        })
+      } -->
+    </ul>
+
+    <div
+      class="hidden items-center py-2 text-gray-400 text-xs mr-2 align-super"
+    >
+    </div>
+  </main>
+</Layout>
+
+<script is:inline define:vars={{ openings, groupedOpenings }}>
+  /**
+   * List field
+   * Logo
+   * Openings content
+   * Opening content
+   * Group listings by
+   */
+</script>

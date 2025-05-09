@@ -1,0 +1,55 @@
+@font-face {
+  font-family: "Tex Gyre Heros";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/texgyreheros-regular.ttf") format("woff2");
+}
+/* cyrillic */
+@font-face {
+  font-family: "Tex Gyre Heros";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/texgyreheros-bold.ttf") format("woff2");
+}
+
+@font-face {
+  font-family: "Satoshi";
+  src: url("/fonts/Satoshi-Variable.ttf") format("woff2");
+  /* font-weight: bold; */
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Satoshi";
+  src: url("/fonts/Satoshi-Variable.ttf") format("woff2");
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Satoshi";
+  src: url("/fonts/Satoshi-Variable.ttf") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Satoshi";
+  src: url("/fonts/Satoshi-Variable.ttf") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Satoshi";
+  src: url("/fonts/Satoshi-Variable.ttf") format("woff2");
+  font-weight: black;
+  font-style: normal;
+  font-display: swap;
+}

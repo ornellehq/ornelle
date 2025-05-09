@@ -1,0 +1,12 @@
+node_modules
+.husky/_
+.env
+*.env
+
+uploads/
+.wrangler
+.venv
+venv
+dist
+.windsurfrules
+.vscode

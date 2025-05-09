@@ -1,0 +1,1124 @@
+{
+	"$id": "prisma",
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"definitions": {
+		"User": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"email": {
+					"type": "string"
+				},
+				"updatedAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"createdAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"firstName": {
+					"type": "string"
+				},
+				"deletedAt": {
+					"type": ["string", "null"],
+					"format": "date-time"
+				}
+			},
+			"required": ["email", "updatedAt", "firstName"]
+		},
+		"Profile": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"updatedAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"createdAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"displayName": {
+					"type": ["string", "null"]
+				},
+				"firstName": {
+					"type": "string"
+				},
+				"lastName": {
+					"type": "string"
+				},
+				"userId": {
+					"type": "string"
+				},
+				"pictureSlug": {
+					"type": ["string", "null"]
+				},
+				"deactivated": {
+					"type": ["string", "null"],
+					"format": "date-time"
+				},
+				"workspaceId": {
+					"type": "string"
+				},
+				"savedFolderId": {
+					"type": ["string", "null"]
+				},
+				"savedId": {
+					"type": ["string", "null"]
+				}
+			},
+			"required": [
+				"updatedAt",
+				"firstName",
+				"lastName",
+				"userId",
+				"workspaceId"
+			]
+		},
+		"Workspace": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"updatedAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"createdAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"url": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"logoSlug": {
+					"type": ["string", "null"]
+				},
+				"creatorId": {
+					"type": "string"
+				},
+				"onboarding": {
+					"type": ["number", "string", "boolean", "object", "array", "null"]
+				}
+			},
+			"required": ["updatedAt", "url", "name", "creatorId"]
+		},
+		"Role": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"updatedAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"createdAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"title": {
+					"type": "string"
+				},
+				"description": {
+					"type": ["number", "string", "boolean", "object", "array", "null"],
+					"description": "[RTEContent]"
+				},
+				"workspaceId": {
+					"type": "string"
+				},
+				"deletedAt": {
+					"type": ["string", "null"],
+					"format": "date-time"
+				}
+			},
+			"required": ["updatedAt", "title", "workspaceId"]
+		},
+		"Opening": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"updatedAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"createdAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"title": {
+					"type": "string"
+				},
+				"description": {
+					"type": ["number", "string", "boolean", "object", "array", "null"],
+					"description": "[RTEContent]"
+				},
+				"workspaceId": {
+					"type": "string"
+				},
+				"roleId": {
+					"type": "string"
+				},
+				"formId": {
+					"type": ["string", "null"]
+				},
+				"status": {
+					"type": "string",
+					"default": "Published",
+					"enum": ["Published", "Draft"]
+				},
+				"deletedAt": {
+					"type": ["string", "null"],
+					"format": "date-time"
+				}
+			},
+			"required": ["updatedAt", "title", "workspaceId", "roleId"]
+		},
+		"ApplicationStatus": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"updatedAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"createdAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"name": {
+					"type": "string"
+				},
+				"workspaceId": {
+					"type": "string"
+				},
+				"category": {
+					"type": "string",
+					"enum": ["NotStarted", "Started", "Completed", "Rejected"]
+				},
+				"isOutOfTheBox": {
+					"type": "boolean",
+					"default": false
+				},
+				"color": {
+					"type": ["string", "null"]
+				},
+				"description": {
+					"type": "string",
+					"default": ""
+				}
+			},
+			"required": ["updatedAt", "name", "workspaceId", "category"]
+		},
+		"Application": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"updatedAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"createdAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"resumeLink": {
+					"type": "string"
+				},
+				"resumeText": {
+					"type": "string"
+				},
+				"resumeData": {
+					"type": ["number", "string", "boolean", "object", "array", "null"]
+				},
+				"workspaceId": {
+					"type": "string"
+				},
+				"openingId": {
+					"type": "string"
+				},
+				"candidateId": {
+					"type": "string"
+				},
+				"creatorId": {
+					"type": ["string", "null"]
+				},
+				"statusId": {
+					"type": ["string", "null"]
+				},
+				"numberInWorkspace": {
+					"type": "integer"
+				},
+				"notes": {
+					"type": ["number", "string", "boolean", "object", "array", "null"],
+					"description": "[RTEContent]"
+				},
+				"responses": {
+					"type": ["number", "string", "boolean", "object", "array", "null"],
+					"description": "[FormResponses]"
+				},
+				"deletedAt": {
+					"type": ["string", "null"],
+					"format": "date-time"
+				}
+			},
+			"required": [
+				"updatedAt",
+				"resumeLink",
+				"resumeText",
+				"workspaceId",
+				"openingId",
+				"candidateId",
+				"numberInWorkspace",
+				"responses"
+			]
+		},
+		"Candidate": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"updatedAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"createdAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"firstName": {
+					"type": "string"
+				},
+				"lastName": {
+					"type": "string"
+				},
+				"email": {
+					"type": "string"
+				},
+				"workspaceId": {
+					"type": "string"
+				},
+				"creatorId": {
+					"type": ["string", "null"]
+				},
+				"numberInWorkspace": {
+					"type": "integer"
+				},
+				"deletedAt": {
+					"type": ["string", "null"],
+					"format": "date-time"
+				}
+			},
+			"required": [
+				"updatedAt",
+				"firstName",
+				"lastName",
+				"email",
+				"workspaceId",
+				"numberInWorkspace"
+			]
+		},
+		"Entity": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"updatedAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"createdAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"name": {
+					"type": "string"
+				},
+				"workspaceId": {
+					"type": "string"
+				}
+			},
+			"required": ["updatedAt", "name", "workspaceId"]
+		},
+		"Attribute": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"updatedAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"createdAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"entityType": {
+					"type": "string",
+					"enum": ["Role", "Opening", "Application", "Candidate", "Custom"]
+				},
+				"name": {
+					"type": "string"
+				},
+				"dataType": {
+					"type": "string",
+					"enum": [
+						"Text",
+						"Number",
+						"Toggle",
+						"Select",
+						"Date",
+						"Email",
+						"URL",
+						"File",
+						"Phone",
+						"Record",
+						"Range",
+						"Location",
+						"Member"
+					]
+				},
+				"workspaceId": {
+					"type": "string"
+				},
+				"creatorId": {
+					"type": "string"
+				},
+				"entityId": {
+					"type": ["string", "null"]
+				},
+				"builtIn": {
+					"type": "boolean"
+				},
+				"configuration": {
+					"type": ["number", "string", "boolean", "object", "array", "null"]
+				}
+			},
+			"required": [
+				"updatedAt",
+				"entityType",
+				"name",
+				"dataType",
+				"workspaceId",
+				"creatorId",
+				"builtIn"
+			]
+		},
+		"AttributeValue": {
+			"type": "object",
+			"properties": {
+				"updatedAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"createdAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"entityId": {
+					"type": "string"
+				},
+				"attributeId": {
+					"type": "string"
+				},
+				"workspaceId": {
+					"type": "string"
+				},
+				"data": {
+					"type": ["number", "string", "boolean", "object", "array", "null"]
+				}
+			},
+			"required": ["updatedAt", "entityId", "attributeId", "workspaceId"]
+		},
+		"Review": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"updatedAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"createdAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"workspaceId": {
+					"type": "string"
+				},
+				"applicationId": {
+					"type": "string"
+				},
+				"authorId": {
+					"type": "string"
+				},
+				"responses": {
+					"type": ["number", "string", "boolean", "object", "array", "null"]
+				},
+				"description": {
+					"type": "string",
+					"default": ""
+				},
+				"status": {
+					"type": "string",
+					"default": "Pending",
+					"enum": ["Pending", "Approved", "Rejected"]
+				},
+				"source": {
+					"type": "string",
+					"enum": ["Profile", "Candidate"]
+				},
+				"sourceId": {
+					"type": "string"
+				},
+				"formId": {
+					"type": ["string", "null"]
+				}
+			},
+			"required": [
+				"updatedAt",
+				"workspaceId",
+				"applicationId",
+				"authorId",
+				"responses",
+				"source",
+				"sourceId"
+			]
+		},
+		"Form": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"updatedAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"createdAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"name": {
+					"type": "string"
+				},
+				"description": {
+					"type": "string"
+				},
+				"workspaceId": {
+					"type": "string"
+				},
+				"authorId": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string",
+					"default": "Application",
+					"enum": ["Application", "Review"]
+				},
+				"content": {
+					"type": ["number", "string", "boolean", "object", "array", "null"]
+				},
+				"deletedAt": {
+					"type": ["string", "null"],
+					"format": "date-time"
+				}
+			},
+			"required": [
+				"updatedAt",
+				"name",
+				"description",
+				"workspaceId",
+				"authorId"
+			]
+		},
+		"EmailTemplate": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"updatedAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"createdAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"name": {
+					"type": "string"
+				},
+				"description": {
+					"type": "string"
+				},
+				"workspaceId": {
+					"type": "string"
+				},
+				"deletedAt": {
+					"type": ["string", "null"],
+					"format": "date-time"
+				},
+				"subject": {
+					"type": "string",
+					"default": ""
+				},
+				"type": {
+					"type": "string",
+					"default": "Application",
+					"enum": ["Application"]
+				},
+				"content": {
+					"type": ["number", "string", "boolean", "object", "array", "null"],
+					"description": "[RTEContent]"
+				}
+			},
+			"required": ["updatedAt", "name", "description", "workspaceId"]
+		},
+		"Activity": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"updatedAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"createdAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"workspaceId": {
+					"type": "string"
+				},
+				"sourceId": {
+					"type": "string"
+				},
+				"entityId": {
+					"type": ["string", "null"]
+				},
+				"entityType": {
+					"type": "string",
+					"enum": ["Role", "Opening", "Application", "Candidate", "Custom"]
+				},
+				"source": {
+					"type": "string",
+					"enum": ["Profile", "Candidate"]
+				},
+				"previousValue": {
+					"type": ["number", "string", "boolean", "object", "array", "null"]
+				},
+				"newValue": {
+					"type": ["number", "string", "boolean", "object", "array", "null"]
+				},
+				"metadata": {
+					"type": ["number", "string", "boolean", "object", "array", "null"]
+				},
+				"type": {
+					"type": "string",
+					"default": "AttributeUpdate",
+					"enum": [
+						"AttributeUpdate",
+						"ConversationCreated",
+						"ConversationStatusChanged",
+						"MessageSent",
+						"EmailSent",
+						"EmailReceived",
+						"ApplicationStatusUpdate",
+						"ReviewRecommended",
+						"ReviewRejected"
+					]
+				},
+				"causedById": {
+					"type": ["string", "null"]
+				}
+			},
+			"required": [
+				"updatedAt",
+				"workspaceId",
+				"sourceId",
+				"entityType",
+				"source"
+			]
+		},
+		"View": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"updatedAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"createdAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"name": {
+					"type": "string"
+				},
+				"description": {
+					"type": ["string", "null"]
+				},
+				"workspaceId": {
+					"type": "string"
+				},
+				"creatorId": {
+					"type": "string"
+				},
+				"folderId": {
+					"type": ["string", "null"]
+				},
+				"public": {
+					"type": "boolean"
+				},
+				"entityType": {
+					"type": "string",
+					"enum": ["Role", "Opening", "Application", "Candidate", "Custom"]
+				},
+				"config": {
+					"type": ["number", "string", "boolean", "object", "array", "null"]
+				}
+			},
+			"required": [
+				"updatedAt",
+				"name",
+				"workspaceId",
+				"creatorId",
+				"public",
+				"entityType"
+			]
+		},
+		"ListingTheme": {
+			"type": "object",
+			"properties": {
+				"key": {
+					"type": "string"
+				},
+				"updatedAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"createdAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"name": {
+					"type": "string"
+				},
+				"workspaceId": {
+					"type": "string"
+				},
+				"openingsConfig": {
+					"type": ["number", "string", "boolean", "object", "array", "null"]
+				},
+				"openingConfig": {
+					"type": ["number", "string", "boolean", "object", "array", "null"]
+				},
+				"active": {
+					"type": "boolean",
+					"default": false
+				}
+			},
+			"required": [
+				"updatedAt",
+				"name",
+				"workspaceId",
+				"openingsConfig",
+				"openingConfig"
+			]
+		},
+		"File": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"updatedAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"createdAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"name": {
+					"type": "string"
+				},
+				"slug": {
+					"type": "string"
+				},
+				"path": {
+					"type": "string"
+				},
+				"size": {
+					"type": "integer"
+				},
+				"mime": {
+					"type": "string"
+				},
+				"checksum": {
+					"type": ["string", "null"]
+				},
+				"workspaceId": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"updatedAt",
+				"name",
+				"slug",
+				"path",
+				"size",
+				"mime",
+				"workspaceId"
+			]
+		},
+		"EmailAddress": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"updatedAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"createdAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"deletedAt": {
+					"type": ["string", "null"],
+					"format": "date-time"
+				},
+				"workspaceId": {
+					"type": "string"
+				},
+				"profileId": {
+					"type": "string"
+				},
+				"email": {
+					"type": "string"
+				},
+				"isActive": {
+					"type": "boolean",
+					"default": true
+				}
+			},
+			"required": ["updatedAt", "workspaceId", "profileId", "email"]
+		},
+		"Conversation": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"updatedAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"createdAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"title": {
+					"type": "string"
+				},
+				"status": {
+					"type": "string",
+					"default": "OPEN",
+					"enum": ["OPEN", "CLOSED", "LOCKED"]
+				},
+				"workspaceId": {
+					"type": "string"
+				},
+				"applicationId": {
+					"type": ["string", "null"]
+				},
+				"candidateId": {
+					"type": ["string", "null"]
+				},
+				"creatorId": {
+					"type": ["string", "null"]
+				}
+			},
+			"required": ["updatedAt", "title", "workspaceId"]
+		},
+		"Message": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"updatedAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"createdAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"deletedAt": {
+					"type": ["string", "null"],
+					"format": "date-time"
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"EMAIL_OUTBOUND",
+						"EMAIL_INBOUND",
+						"INTERNAL_MESSAGE",
+						"INTERNAL_RESPONSE",
+						"PLATFORM"
+					]
+				},
+				"status": {
+					"type": "string",
+					"default": "DRAFT",
+					"enum": [
+						"DRAFT",
+						"SENDING",
+						"SENT",
+						"PUBLISHED",
+						"DELIVERED",
+						"FAILED",
+						"BOUNCED",
+						"ARCHIVED"
+					]
+				},
+				"content": {
+					"type": "string"
+				},
+				"applicationId": {
+					"type": ["string", "null"]
+				},
+				"fromCandidateId": {
+					"type": ["string", "null"]
+				},
+				"conversationId": {
+					"type": ["string", "null"]
+				},
+				"workspaceId": {
+					"type": "string"
+				},
+				"authorId": {
+					"type": ["string", "null"]
+				},
+				"parentId": {
+					"type": ["string", "null"]
+				},
+				"metadata": {
+					"type": ["number", "string", "boolean", "object", "array", "null"]
+				},
+				"attachments": {
+					"type": ["number", "string", "boolean", "object", "array", "null"]
+				},
+				"subject": {
+					"type": ["string", "null"]
+				},
+				"fromEmail": {
+					"type": ["string", "null"]
+				},
+				"toEmails": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"ccEmails": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"bccEmails": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			},
+			"required": [
+				"updatedAt",
+				"type",
+				"content",
+				"workspaceId",
+				"toEmails",
+				"ccEmails",
+				"bccEmails"
+			]
+		},
+		"SavedFolder": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"createdAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"updatedAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"name": {
+					"type": "string"
+				},
+				"creatorId": {
+					"type": "string"
+				},
+				"workspaceId": {
+					"type": "string"
+				},
+				"isSharedWithWorkspace": {
+					"type": "boolean",
+					"default": false
+				},
+				"parentId": {
+					"type": ["string", "null"]
+				}
+			},
+			"required": ["updatedAt", "name", "creatorId", "workspaceId"]
+		},
+		"Saved": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"createdAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"updatedAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"name": {
+					"type": ["string", "null"]
+				},
+				"creatorId": {
+					"type": "string"
+				},
+				"workspaceId": {
+					"type": "string"
+				},
+				"entityId": {
+					"type": "string"
+				},
+				"entityType": {
+					"type": "string"
+				},
+				"folderId": {
+					"type": ["string", "null"]
+				},
+				"isSharedWithWorkspace": {
+					"type": "boolean",
+					"default": false
+				}
+			},
+			"required": [
+				"updatedAt",
+				"creatorId",
+				"workspaceId",
+				"entityId",
+				"entityType"
+			]
+		}
+	},
+	"type": "object",
+	"properties": {
+		"user": {
+			"$ref": "prisma#/definitions/User"
+		},
+		"profile": {
+			"$ref": "prisma#/definitions/Profile"
+		},
+		"workspace": {
+			"$ref": "prisma#/definitions/Workspace"
+		},
+		"role": {
+			"$ref": "prisma#/definitions/Role"
+		},
+		"opening": {
+			"$ref": "prisma#/definitions/Opening"
+		},
+		"applicationStatus": {
+			"$ref": "prisma#/definitions/ApplicationStatus"
+		},
+		"application": {
+			"$ref": "prisma#/definitions/Application"
+		},
+		"candidate": {
+			"$ref": "prisma#/definitions/Candidate"
+		},
+		"entity": {
+			"$ref": "prisma#/definitions/Entity"
+		},
+		"attribute": {
+			"$ref": "prisma#/definitions/Attribute"
+		},
+		"attributeValue": {
+			"$ref": "prisma#/definitions/AttributeValue"
+		},
+		"review": {
+			"$ref": "prisma#/definitions/Review"
+		},
+		"form": {
+			"$ref": "prisma#/definitions/Form"
+		},
+		"emailTemplate": {
+			"$ref": "prisma#/definitions/EmailTemplate"
+		},
+		"activity": {
+			"$ref": "prisma#/definitions/Activity"
+		},
+		"view": {
+			"$ref": "prisma#/definitions/View"
+		},
+		"listingTheme": {
+			"$ref": "prisma#/definitions/ListingTheme"
+		},
+		"file": {
+			"$ref": "prisma#/definitions/File"
+		},
+		"emailAddress": {
+			"$ref": "prisma#/definitions/EmailAddress"
+		},
+		"conversation": {
+			"$ref": "prisma#/definitions/Conversation"
+		},
+		"message": {
+			"$ref": "prisma#/definitions/Message"
+		},
+		"savedFolder": {
+			"$ref": "prisma#/definitions/SavedFolder"
+		},
+		"saved": {
+			"$ref": "prisma#/definitions/Saved"
+		}
+	}
+}

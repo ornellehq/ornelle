@@ -1,0 +1,18 @@
+{
+	"extends": [
+		"@tsconfig/strictest/tsconfig.json",
+		"@tsconfig/node22/tsconfig.json"
+	],
+	"compilerOptions": {
+		"forceConsistentCasingInFileNames": true,
+		"checkJs": false,
+		"strictNullChecks": true,
+		"resolveJsonModule": true,
+		"noPropertyAccessFromIndexSignature": false,
+		"composite": true
+	},
+	"ts-node": {
+		"swc": true,
+		"esm": true
+	}
+}
