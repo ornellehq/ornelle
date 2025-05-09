@@ -6,7 +6,8 @@
 	"scripts": {
 		"test": "pnpm --stream --filter '*' test",
 		"prepare": "husky",
-		"dev": "conc \"pnpm --stream --filter '*' dev\" --prefix='{name} ➜' --names='app' --prefix-colors='#F45866'"
+		"dev": "conc \"pnpm --stream --filter '*' dev\" --prefix='{name} ➜' --names='app' --prefix-colors='#F45866'",
+		"lint": "pnpm biome check --write --no-errors-on-unmatched"
 	},
 	"keywords": [],
 	"author": "",
@@ -17,10 +18,13 @@
 		"@tsconfig/strictest": "^2.0.5",
 		"@types/indefinite": "^2.3.4",
 		"@types/node": "^22.0.2",
+		"chalk": "^4.1.2",
 		"concurrently": "^9.1.2",
 		"husky": "^9.1.4",
 		"lint-staged": "^15.2.7",
+		"ora": "^5.4.1",
 		"prettier": "^3.3.3",
+		"prompts": "^2.4.2",
 		"ts-node": "^10.9.2",
 		"typescript": "^5.5.4",
 		"vitest": "^3.1.2"
