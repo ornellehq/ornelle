@@ -51,6 +51,11 @@ const ENV_FILES = [
     target: path.join(__dirname, "packages/webpages/.env"),
     required: false,
   },
+  {
+    sample: path.join(__dirname, "packages/isomorphic-blocs/.env.sample"),
+    target: path.join(__dirname, "packages/isomorphic-blocs/.env"),
+    required: true,
+  },
 ]
 
 // Helper functions
@@ -58,8 +63,23 @@ function updateEnvFile(filePath, replacements) {
   let content = fs.readFileSync(filePath, "utf8")
 
   for (const [key, value] of Object.entries(replacements)) {
+    // Handle different types of values and quoting correctly
+    let formattedValue = value
+
+    // For URLs and similar values that need quotes
+    if (
+      typeof value === "string" &&
+      (key === "DATABASE_URL" ||
+        value.includes("{") ||
+        value.includes(" ") ||
+        value.includes("/") ||
+        (value.includes(":") && !value.startsWith('"')))
+    ) {
+      formattedValue = `"${value}"`
+    }
+
     const regex = new RegExp(`${key}=.*`, "g")
-    content = content.replace(regex, `${key}=${value}`)
+    content = content.replace(regex, `${key}=${formattedValue}`)
   }
 
   fs.writeFileSync(filePath, content)
@@ -128,17 +148,66 @@ async function configureDatabase() {
     return
   }
 
+  // Get current system username
+  let currentUsername = ""
+  try {
+    currentUsername = execSync("whoami").toString().trim()
+  } catch (error) {
+    try {
+      currentUsername = execSync('echo "$USER"').toString().trim()
+    } catch (innerError) {
+      console.log(
+        chalk.yellow("⚠️ Could not determine current username, using default"),
+      )
+      currentUsername = "postgres"
+    }
+  }
+
   const { dbUrl } = await promptsWithCancellation({
     type: "text",
     name: "dbUrl",
     message: "Enter PostgreSQL connection URL:",
-    initial: "postgresql://username:password@localhost:5432/ornelle_db",
+    initial: `postgresql://${currentUsername}:@localhost:5432/ornelle-ats?schema=public`,
   })
 
   const spinner = ora("Updating database configuration").start()
   try {
     updateEnvFile(serverEnvPath, { DATABASE_URL: dbUrl })
     spinner.succeed("Database configuration updated")
+
+    // Set up isomorphic-blocs .env file
+    const isomorphicBlocsEnvPath = path.join(
+      __dirname,
+      "packages/isomorphic-blocs/.env",
+    )
+
+    if (!fs.existsSync(isomorphicBlocsEnvPath)) {
+      console.log(chalk.yellow("⚠️ Creating isomorphic-blocs .env file"))
+      // The file should already be created through the ENV_FILES setup
+      updateEnvFile(isomorphicBlocsEnvPath, {
+        DATABASE_URL: dbUrl,
+        NODE_ENV: "development",
+      })
+    } else {
+      updateEnvFile(isomorphicBlocsEnvPath, {
+        DATABASE_URL: dbUrl,
+        NODE_ENV: "development",
+      })
+      console.log(
+        chalk.green("✓ Updated .env file for isomorphic-blocs package"),
+      )
+    }
+
+    // Update the KeyToMothership in webpages .env to match Keys.pages value in server .env
+    const webpagesEnvPath = path.join(__dirname, "packages/webpages/.env")
+    if (fs.existsSync(webpagesEnvPath)) {
+      const serverEnvContent = fs.readFileSync(serverEnvPath, "utf8")
+      const keysMatch = serverEnvContent.match(/Keys=.*?"pages":"([^"]*)"/)
+      if (keysMatch && keysMatch[1]) {
+        updateEnvFile(webpagesEnvPath, { KeyToMothership: keysMatch[1] })
+        console.log(chalk.green("✓ Updated encryption key in webpages .env"))
+      }
+    }
   } catch (error) {
     spinner.fail(`Failed to update database configuration: ${error.message}`)
   }
@@ -306,7 +375,24 @@ async function configureBusiness() {
 
   const spinner = ora("Updating business information").start()
   try {
+    // Update webapp .env
     updateEnvFile(webappEnvPath, { VITE_BUSINESS_NAME: businessName })
+
+    // Ensure server URLs are consistent across all .env files
+    const serverEnvPath = path.join(__dirname, "packages/server/.env")
+    const webpagesEnvPath = path.join(__dirname, "packages/webpages/.env")
+
+    if (fs.existsSync(webpagesEnvPath)) {
+      updateEnvFile(webpagesEnvPath, { Mothership: "http://localhost:3001" })
+    }
+
+    if (fs.existsSync(serverEnvPath)) {
+      updateEnvFile(serverEnvPath, {
+        PagesUrl: "http://localhost:4321",
+        ServerUrl: "http://localhost:3001",
+      })
+    }
+
     spinner.succeed("Business information updated")
   } catch (error) {
     spinner.fail(`Failed to update business information: ${error.message}`)
@@ -318,6 +404,11 @@ async function configureBusiness() {
  */
 async function runMigrations() {
   console.log(chalk.bold("\n🔄 Database Migrations"))
+  console.log(
+    chalk.yellow(
+      "⚠️ Warning: You will be unable to start the app until migrations are created",
+    ),
+  )
 
   const { shouldRun } = await promptsWithCancellation({
     type: "confirm",
@@ -328,6 +419,14 @@ async function runMigrations() {
 
   if (!shouldRun) {
     console.log(chalk.yellow("⏭️ Skipping database migrations"))
+    console.log(
+      chalk.bold(
+        "\n❗ Important: App will not start properly until migrations are created.",
+      ),
+    )
+    console.log(chalk.cyan("To run migrations later, execute:"))
+    console.log(chalk.cyan("  cd packages/isomorphic-blocs"))
+    console.log(chalk.cyan("  pnpm prisma migrate dev"))
     return
   }
 
@@ -342,11 +441,27 @@ async function runMigrations() {
     } catch (execError) {
       spinner.fail(`Migration error: ${execError.message}`)
       console.log(chalk.dim(execError.stdout?.toString() || ""))
+      console.log(
+        chalk.bold(
+          "\n❗ App will not start properly until migrations are created successfully.",
+        ),
+      )
+      console.log(chalk.cyan("Please fix the issues above and run:"))
+      console.log(chalk.cyan("  cd packages/isomorphic-blocs"))
+      console.log(chalk.cyan("  pnpm prisma migrate dev"))
     }
 
     process.chdir(originalDir)
   } catch (error) {
     spinner.fail(`Failed to run migrations: ${error.message}`)
+    console.log(
+      chalk.bold(
+        "\n❗ App will not start properly until migrations are created successfully.",
+      ),
+    )
+    console.log(chalk.cyan("Please fix any issues and run:"))
+    console.log(chalk.cyan("  cd packages/isomorphic-blocs"))
+    console.log(chalk.cyan("  pnpm prisma migrate dev"))
   }
 }
 

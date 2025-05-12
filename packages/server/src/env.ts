@@ -188,7 +188,7 @@ const schema: JSONSchemaType<Env> = {
     },
     Storage: {
       type: "object",
-      required: ["provider", "aws"],
+      required: ["provider"],
       additionalProperties: false,
       "x-string": true,
       properties: {
